@@ -1,15 +1,14 @@
-import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 import type { TodoUpdate } from '@/types/database'
+import { getSupabase } from '@/lib/supabase'
 
-export const dynamic = 'force-dynamic'
-
-type Params = { params: Promise<{ id: string }> }
-
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params
   const body: TodoUpdate = await request.json()
 
+  const supabase = getSupabase()
   const { data, error } = await supabase
     .from('todos')
     .update(body)
@@ -17,15 +16,19 @@ export async function PATCH(request: Request, { params }: Params) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  if (error) return Response.json({ error: error.message }, { status: 500 })
+  return Response.json(data)
 }
 
-export async function DELETE(_request: Request, { params }: Params) {
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params
 
+  const supabase = getSupabase()
   const { error } = await supabase.from('todos').delete().eq('id', id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return new NextResponse(null, { status: 204 })
+  if (error) return Response.json({ error: error.message }, { status: 500 })
+  return new Response(null, { status: 204 })
 }

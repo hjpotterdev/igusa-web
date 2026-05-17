@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import type { TodoUpdate } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
+
 type Params = { params: Promise<{ id: string }> }
 
 export async function PATCH(request: Request, { params }: Params) {
